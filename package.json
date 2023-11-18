@@ -1,6 +1,6 @@
 {
   "name": "proxy-target",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "A response to the ugly state of ECMAScript Proxy standard",
   "main": "./cjs/index.js",
   "scripts": {
@@ -12,7 +12,10 @@
     "ts": "tsc -p .",
     "coverage": "mkdir -p ./coverage; c8 report --reporter=text-lcov > ./coverage/lcov.info"
   },
-  "keywords": ["proxy", "target"],
+  "keywords": [
+    "proxy",
+    "target"
+  ],
   "author": "Andrea Giammarchi",
   "license": "MIT",
   "devDependencies": {
