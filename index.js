@@ -26,17 +26,17 @@ var proxyTarget = (function (exports) {
 
   /**
    * @template T
-   * @typedef {{type: T extends bigint ? BIGINT : T extends boolean ? BOOLEAN : T extends null ? NULL : T extends number ? NUMBER : T extends string ? STRING : T extends symbol ? SYMBOL : T extends undefined ? UNDEFINED : OBJECT, value: T}} Wrap
+   * @typedef {T extends Array ? ARRAY : T extends BigInt ? BIGINT : T extends Boolean ? BOOLEAN : T extends Function ? FUNCTION : T extends Number ? NUMBER : T extends String ? STRING : T extends Symbol ? SYMBOL : OBJECT} Type
    */
 
   /**
    * @template T
-   * @typedef {{type: T extends Array ? ARRAY : T extends bigint ? BIGINT : T extends boolean ? BOOLEAN : T extends function ? FUNCTION : T extends null ? NULL : T extends number ? NUMBER : T extends string ? STRING : T extends symbol ? SYMBOL : T extends undefined ? UNDEFINED : OBJECT, value: T}} Pair
+   * @typedef {{type: Type<T>, value: T}} Pair
    */
 
   /**
    * @template T
-   * @param {string} type
+   * @param {Type<T>} type
    * @param {T} value
    * @returns {Pair<T>}
    */
@@ -45,7 +45,7 @@ var proxyTarget = (function (exports) {
   /**
    * @template T
    * @param {T} value
-   * @returns {T extends Array ? Arr<T> : T extends function ? Bound<T> : Wrap<T>}
+   * @returns {T extends Array ? Arr<T> : T extends Function ? Bound<T> : Pair<T>}
    */
   const wrap = value => {
     const type = typeof value;
@@ -61,7 +61,7 @@ var proxyTarget = (function (exports) {
 
   /**
    * @template T
-   * @param {Arr<T> | Bound<T> | Wrap<T>} value
+   * @param {Arr<T> | Bound<T> | Pair<T>} value
    * @returns {Pair<T>}
    */
   const unwrap = value => (

@@ -2,13 +2,13 @@
 
 [![build status](https://github.com/WebReflection/proxy-target/actions/workflows/node.js.yml/badge.svg)](https://github.com/WebReflection/proxy-target/actions) [![Coverage Status](https://coveralls.io/repos/github/WebReflection/proxy-target/badge.svg?branch=main)](https://coveralls.io/github/WebReflection/proxy-target?branch=main)
 
-A response to the ugly state of ECMAScript Proxy standard, where in theory nobody should understand what's the proxied value but in practice a lot of operations fail if you are not providing the expected target out there.
+A wrap/unwrap Proxy utility as answer to [these](https://es.discourse.group/t/the-array-isarray-shenanigans/1745) weird [limitations](https://es.discourse.group/t/proxy-drilling-once-again/1850).
 
-This module allows any primitive to complex value to be proxied in a way that any handler can understand once the `unwrap(target)` operation is perfomed among actions:
+This module allows any primitive to complex value to be proxied in a way that any handler can understand once the `unwrap(target)` operation is performed among actions:
 
   * *arrays* remain arrays and return `{type: "array", value: array}` once unwrapped
-  * *primitives* and *null*, *undefined*, or *object* generic types are preserved, among any other primitive, and return `{type: actualTypeof, value: actualValue}` once unwrapped
-  * *function* still survive the `typeof` check but return the `{type: "function", value: callback}` once unwrapped
+  * *primitives* and *null*, *undefined*, or *object* generic types are preserved, among any other primitive, and return `{type: actualType, value: actualValue}` once unwrapped
+  * *function* still survive the `typeof` check and return the `{type: "function", value: callback}` once unwrapped
 
 
 ```js

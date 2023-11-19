@@ -1,7 +1,7 @@
 {
   "name": "proxy-target",
   "version": "1.0.0",
-  "description": "A response to the ugly state of ECMAScript Proxy standard",
+  "description": "A wrap/unwrap Proxy utility",
   "main": "./cjs/index.js",
   "scripts": {
     "build": "npm run cjs && npm run rollup:es && npm run rollup:index && npm run ts && npm run test",
@@ -30,8 +30,19 @@
   "type": "module",
   "exports": {
     ".": {
+      "types": "./types/index.d.ts",
       "import": "./esm/index.js",
       "default": "./cjs/index.js"
+    },
+    "./create": {
+      "types": "./types/create.d.ts",
+      "import": "./esm/create.js",
+      "default": "./cjs/create.js"
+    },
+    "./traps": {
+      "types": "./types/traps.d.ts",
+      "import": "./esm/traps.js",
+      "default": "./cjs/traps.js"
     },
     "./package.json": "./package.json"
   },

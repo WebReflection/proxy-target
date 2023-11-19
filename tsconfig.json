@@ -9,9 +9,8 @@
         "declarationDir": "types"
     },
     "include": [
+        "esm/create.js",
         "esm/index.js",
-        "esm/init.js",
-        "esm/keyed.js",
-        "esm/node.js",
+        "esm/traps.js",
     ]
 }
