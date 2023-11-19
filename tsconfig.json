@@ -6,6 +6,7 @@
         "allowJs": true,
         "declaration": true,
         "emitDeclarationOnly": true,
+        "strictNullChecks": true,
         "declarationDir": "types"
     },
     "include": [

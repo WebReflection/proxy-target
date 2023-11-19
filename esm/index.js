@@ -23,7 +23,7 @@ const { isArray } = Array;
 
 /**
  * @template T
- * @typedef {T extends Array ? ARRAY : T extends BigInt ? BIGINT : T extends Boolean ? BOOLEAN : T extends Function ? FUNCTION : T extends Number ? NUMBER : T extends String ? STRING : T extends Symbol ? SYMBOL : OBJECT} Type
+ * @typedef {T extends Array ? ARRAY : T extends bigint ? BIGINT : T extends boolean ? BOOLEAN : T extends function ? FUNCTION : T extends null ? NULL : T extends number ? NUMBER : T extends string ? STRING : T extends symbol ? SYMBOL : T extends undefined ? UNDEFINED : OBJECT} Type
  */
 
 /**
