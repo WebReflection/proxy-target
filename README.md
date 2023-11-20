@@ -16,7 +16,7 @@ import { wrap, unwrap } from 'proxy-target';
 let target;
 
 target = wrap([1, 2, 3]);
-// ["array", [1, 2, 3]]
+// remains [1, 2, 3]
 unwrap(target);
 // {type: "array", value: [1, 2, 3]}
 
@@ -27,7 +27,7 @@ unwrap(target);
 // {type: "object", value: {a: 1}}
 
 target = wrap(i => i + 123);
-// () => i => i + 123
+// remains i => i + 123
 unwrap(target);
 // {type: "function", value: i => i + 123}
 
@@ -48,15 +48,17 @@ target = wrap(Symbol());
 
 ## Types
 
-| JS         | type        |
-| :--------- | :---------- |
-| `[]`       | `array`     |
-| `1n`       | `bigint`    |
-| `!0`       | `boolean`   |
-| `() => {}` | `function`  |
-| `null`     | `null`      |
-| `1.2`      | `number`    |
-| `{}`       | `object`    |
-| `''`       | `string`    |
-| `Symbol()` | `symbol`    |
-| `void 0`   | `undefined` |
+Once *unwrap* is used, the `type` of the `{type, value}` *pair* will be the following one:
+
+| JS         | type          |
+| :--------- | :------------ |
+| `[]`       | `"array"`     |
+| `1n`       | `"bigint"`    |
+| `!0`       | `"boolean"`   |
+| `() => {}` | `"function"`  |
+| `null`     | `"null"`      |
+| `1.2`      | `"number"`    |
+| `{}`       | `"object"`    |
+| `''`       | `"string"`    |
+| `Symbol()` | `"symbol"`    |
+| `void 0`   | `"undefined"` |
