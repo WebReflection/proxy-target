@@ -7,10 +7,10 @@
         "declaration": true,
         "emitDeclarationOnly": true,
         "strictNullChecks": true,
+        "checkJs": false,
         "declarationDir": "types"
     },
     "include": [
-        "esm/create.js",
         "esm/index.js",
         "esm/traps.js",
     ]

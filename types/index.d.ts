@@ -8,12 +8,10 @@ export const OBJECT: "object";
 export const STRING: "string";
 export const SYMBOL: "symbol";
 export const UNDEFINED: "undefined";
-export function wrap<T>(value: T): T extends any[] ? Arr<T> : T extends Function ? Bound<T> : Pair<T>;
-export function unwrap<T>(value: Arr<T> | Bound<T> | Pair<T>): Pair<T>;
-export type Arr<T> = ["array", T];
-export type Bound<T> = () => T;
-export type Type<T> = T extends any[] ? "array" : T extends bigint ? "bigint" : T extends boolean ? "boolean" : T extends Function ? "function" : T extends null ? "null" : T extends number ? "number" : T extends string ? "string" : T extends symbol ? "symbol" : T extends undefined ? "undefined" : "object";
-export type Pair<T> = {
-    type: Type<T>;
-    value: T;
+export function pair<Type, Value>(type: Type, value: Value): Pair<Type, Value>;
+export function unwrap<Value>(value: Value): Value extends any[] ? Pair<"array", Value> : Value extends Function ? Pair<"function", Value> : Value;
+export function wrap<V>(value: V): V extends any[] ? V : V extends Function ? V : V extends bigint ? Pair<"bigint", V> : V extends boolean ? Pair<"boolean", V> : V extends null ? Pair<"null", null> : V extends number ? Pair<"number", V> : V extends string ? Pair<"string", V> : V extends symbol ? Pair<"symbol", V> : V extends undefined ? Pair<"undefined", undefined> : Pair<"object", V>;
+export type Pair<Type, Value> = {
+    type: Type;
+    value: Value;
 };

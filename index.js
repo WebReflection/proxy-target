@@ -15,64 +15,38 @@ var proxyTarget = (function (exports) {
   const { isArray } = Array;
 
   /**
-   * @template T
-   * @typedef {[ARRAY, T]} Arr
+   * @template Type, Value
+   * @typedef {{type:Type, value:Value}} Pair
    */
 
   /**
-   * @template T
-   * @typedef {() => T} Bound
-   */
-
-  /**
-   * @template T
-   * @typedef {T extends Array ? ARRAY : T extends bigint ? BIGINT : T extends boolean ? BOOLEAN : T extends function ? FUNCTION : T extends null ? NULL : T extends number ? NUMBER : T extends string ? STRING : T extends symbol ? SYMBOL : T extends undefined ? UNDEFINED : OBJECT} Type
-   */
-
-  /**
-   * @template T
-   * @typedef {{type: Type<T>, value: T}} Pair
-   */
-
-  /**
-   * @template T
-   * @param {Type<T>} type
-   * @param {T} value
-   * @returns {Pair<T>}
+   * @template Type, Value
+   * @param {Type} type
+   * @param {Value} value
+   * @returns {Pair<Type, Value>}
    */
   const pair = (type, value) => ({ type, value });
 
   /**
-   * @template T
-   * @param {T} value
-   * @returns {T extends Array ? Arr<T> : T extends Function ? Bound<T> : Pair<T>}
-   */
-  const wrap = value => {
-    const type = typeof value;
-    switch (type) {
-      case FUNCTION: return bound.bind(value);
-      case OBJECT: return isArray(value) ?
-        [ARRAY, value] :
-        pair(value ? type : NULL, value)
-      ;
-      default: return pair(type, value);
-    }
-  };
-
-  /**
-   * @template T
-   * @param {Arr<T> | Bound<T> | Pair<T>} value
-   * @returns {Pair<T>}
+   * @template Value
+   * @param {Value} value
+   * @returns {Value extends Array ? Pair<ARRAY,Value> : Value extends Function ? Pair<FUNCTION,Value> : Value}
    */
   const unwrap = value => (
     typeof value === FUNCTION ?
-      pair(FUNCTION, value()) :
-      (isArray(value) ? pair(...value) : value)
+      pair(FUNCTION, value) :
+      (isArray(value) ? pair(ARRAY, value) : value)
   );
 
-  function bound() {
-    return this;
-  }
+  /**
+   * @template V
+   * @param {V} value
+   * @returns {V extends Array ? V : V extends Function ? V : V extends bigint ? Pair<BIGINT,V> : V extends boolean ? Pair<BOOLEAN,V> : V extends null ? Pair<NULL,null> : V extends number ? Pair<NUMBER,V> : V extends string ? Pair<STRING,V> : V extends symbol ? Pair<SYMBOL,V> : V extends undefined ? Pair<UNDEFINED,undefined> : Pair<OBJECT,V>}
+   */
+  const wrap = value => {
+    const type = value === null ? NULL : typeof value;
+    return type === FUNCTION || (type === OBJECT && isArray(value)) ? value : pair(type, value);
+  };
 
   exports.ARRAY = ARRAY;
   exports.BIGINT = BIGINT;
@@ -84,6 +58,7 @@ var proxyTarget = (function (exports) {
   exports.STRING = STRING;
   exports.SYMBOL = SYMBOL;
   exports.UNDEFINED = UNDEFINED;
+  exports.pair = pair;
   exports.unwrap = unwrap;
   exports.wrap = wrap;
 
