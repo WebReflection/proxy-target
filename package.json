@@ -1,6 +1,6 @@
 {
   "name": "proxy-target",
-  "version": "2.0.4",
+  "version": "2.0.5",
   "description": "A wrap/unwrap Proxy utility",
   "main": "./cjs/index.js",
   "scripts": {
