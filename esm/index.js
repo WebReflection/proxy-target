@@ -9,7 +9,7 @@ const { isArray } = Array;
 
 /**
  * @template T, V
- * @typedef {{type:T, value:V}} Pair
+ * @typedef {{type:T, value:V}} Obj
  */
 
 /** @typedef {ARRAY | BIGINT | BOOLEAN | FUNCTION | NULL | NUMBER | OBJECT | STRING | SYMBOL | UNDEFINED} Type */
@@ -18,7 +18,7 @@ const { isArray } = Array;
  * @template T, V
  * @param {T} type
  * @param {V} value
- * @returns {Pair<T, V>}
+ * @returns {Obj<T, V>}
  */
 export const pair = (type, value) => ({ type, value });
 
@@ -27,7 +27,7 @@ const unwrapDefault = (/** @type {Type} */ type, value) => value;
 /**
  * @template P, V
  * @param {P} wrap
- * @returns {P extends Pair<Type, V> ? V : P}
+ * @returns {P extends Obj<Type, V> ? V : P}
  */
 export const unwrap = (wrap, revive = unwrapDefault) => {
   /** @type {Type} */
@@ -37,8 +37,8 @@ export const unwrap = (wrap, revive = unwrapDefault) => {
     // but consider arrays
     if (isArray(wrap))
       type = ARRAY;
-    // otherwise get `{type, value}` form the pair
     else
+      // @ts-ignore
       ({ type, value } = wrap);
   }
   return revive(type, value);
@@ -54,7 +54,7 @@ const wrapDefault = (/** @type {Type} */ type, value) => (
  * It returns the function or the array as they are otherwise.
  * @template V
  * @param {V} value
- * @returns {V extends Array ? V : V extends Function ? V : Pair<V extends bigint ? BIGINT : V extends boolean ? BOOLEAN : V extends null ? NULL : V extends number ? NUMBER : V extends string ? STRING : V extends symbol ? SYMBOL : V extends undefined ? UNDEFINED : OBJECT, V>}
+ * @returns {V extends Array ? V : V extends Function ? V : Obj<V extends bigint ? BIGINT : V extends boolean ? BOOLEAN : V extends null ? NULL : V extends number ? NUMBER : V extends string ? STRING : V extends symbol ? SYMBOL : V extends undefined ? UNDEFINED : OBJECT, V>}
  */
 export const wrap = (value, resolve = wrapDefault) => {
   const type = value === null ? NULL : typeof value;
@@ -73,11 +73,15 @@ export const bound = value => what.bind(value);
 /**
  * Invoke a possibly bound value if the parameter is a function.
  * This is handy only for values that passed through `bound(value)`.
- * @template V, B
+ * @template V, T
  * @param {V} value
- * @returns {V extends Bound<B> ? B : V}
+ * @returns {V extends Bound<T> ? ReturnType<V> : V}
  */
-export const unbound = value => typeof value === FUNCTION ? value() : value;
+export const unbound = value => (
+  typeof value === FUNCTION ?
+    (/** @type {Function} */ (value))() :
+    value
+);
 
 function what() {
   'use strict';
