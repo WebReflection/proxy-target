@@ -31,20 +31,15 @@ const { isArray } = Array;
  */
 export const pair = (type, value) => ({ type, value });
 
-/**
- * @template V
- * @param {Type} type
- * @param {V} value
- * @returns {V}
- */
-const unwrapDefault = (type, value) => value;
+const unwrapDefault = (/** @type {Type} */ type, value) => value;
 
 /**
- * @template P
+ * @template P, V
  * @param {P} wrap
- * @returns {P extends Pair<Type,V> ? V : P}
+ * @returns {P extends Pair<Type, V> ? V : P}
  */
 export const unwrap = (wrap, revive = unwrapDefault) => {
+  /** @type {Type} */
   let type = typeof wrap, value = wrap;
   // ignore function
   if (type === OBJECT) {
@@ -58,14 +53,7 @@ export const unwrap = (wrap, revive = unwrapDefault) => {
   return revive(type, value);
 };
 
-/**
- * Returns the function or array as they are or a `{type, value}` pair.
- * @template Value
- * @param {Type} type
- * @param {Value} value
- * @returns {Value extends Array ? Value : Value extends Function ? Value : Pair<Type,Value>}
- */
-const wrapDefault = (type, value) => (
+const wrapDefault = (/** @type {Type} */ type, value) => (
   type === FUNCTION || type === ARRAY ?
     value : pair(type, value)
 );
@@ -78,9 +66,8 @@ const wrapDefault = (type, value) => (
  * @returns {V extends Array ? V : V extends Function ? V : Pair<V extends bigint ? BIGINT : V extends boolean ? BOOLEAN : V extends null ? NULL : V extends number ? NUMBER : V extends string ? STRING : V extends symbol ? SYMBOL : V extends undefined ? UNDEFINED : OBJECT, V>}
  */
 export const wrap = (value, resolve = wrapDefault) => {
-  const t = value === null ? NULL : typeof value;
-  const type = t === OBJECT && isArray(value) ? ARRAY : t;
-  return resolve(/** @type {Type} */ type, value);
+  const type = value === null ? NULL : typeof value;
+  return resolve(type === OBJECT && isArray(value) ? ARRAY : type, value);
 };
 
 /**
@@ -95,9 +82,9 @@ export const bound = value => what.bind(value);
 /**
  * Invoke a possibly bound value if the parameter is a function.
  * This is handy only for values that passed through `bound(value)`.
- * @template V
+ * @template V, B
  * @param {V} value
- * @returns {V extends function ? V : V}
+ * @returns {V extends Bound<B> ? B : V}
  */
 export const unbound = value => typeof value === FUNCTION ? value() : value;
 
