@@ -6,59 +6,94 @@ A wrap/unwrap Proxy utility as answer to [these](https://es.discourse.group/t/th
 
 This module allows any primitive to complex value to be proxied in a way that any handler can understand once the `unwrap(target)` operation is performed among actions:
 
-  * *arrays* remain arrays and return `{type: "array", value: array}` once unwrapped
-  * *primitives* and *null*, *undefined*, or *object* generic types are preserved, among any other primitive, and return `{type: actualType, value: actualValue}` once unwrapped
-  * *function* still survive the `typeof` check and return the `{type: "function", value: callback}` once unwrapped
+  * *arrays* remain arrays and *callbacks* remain callbacks
+  * *primitives* and *null*, *undefined* or *object* generic types are preserved, among any other primitive, and return `{type: actualType, value: actualValue}` once wrapped
 
+## Type / Value -> Wrap
+
+| type          | value          | wrap                                    |
+| :------------ | :------------- | :-------------------------------------- |
+| `"array"`     | `[1, 2]`       | `[1, 2]`                                |
+| `"bigint"`    | `1n`           | `{type: "bigint", value: 1n}`           |
+| `"boolean"`   | `false`        | `{type: "boolean", value: false}`       |
+| `"function"`  | `(a, b) => {}` | `(a, b) => {}`                          |
+| `"null"`      | `null`         | `{type: "null", value: null}`           |
+| `"number"`    | `1.2`          | `{type: "number", value: 1.2}`          |
+| `"object"`    | `{a: 0}`       | `{type: "object", value: {a: 0}}`       |
+| `"string"`    | `""`           | `{type: "string", value: ""}`           |
+| `"symbol"`    | `Symbol()`     | `{type: "symbol", value: Symbol()}`     |
+| `"undefined"` | `void 0`       | `{type: "undefined", value: undefined}` |
+|               |                |                                         |
+| `"custom"`    | notArrOrFunc   | `{type: "custom", value: notArrOrFunc}` |
+
+## Example / API
 
 ```js
-import { wrap, unwrap } from 'proxy-target';
+import {
+  bound,  // return a function that returns its bound context
+  unbound,// if function, invokes it to return the context
+  pair,   // create a `{type, value}` pair to proxy as target
+  wrap,   // returns array, function, or a pair
+  unwrap  // returns the wrapped value
+} from 'proxy-target';
+
 let target;
 
 target = wrap([1, 2, 3]);
 // remains [1, 2, 3]
 unwrap(target);
-// {type: "array", value: [1, 2, 3]}
+// still [1, 2, 3]
 
-target = wrap({a: 1});
+// both wrap and unwrap accept an optional callback
+// the returned value will the one returned by wrap
+target = wrap({a: 1}, (type, value) => pair(type, value));
 // {type: "object", value: {a: 1}}
-unwrap(target);
-// same as target ,same reference:
-// {type: "object", value: {a: 1}}
+unwrap(target, (type, value) => value);
+// {a: 1}
 
 target = wrap(i => i + 123);
 // remains i => i + 123
 unwrap(target);
-// {type: "function", value: i => i + 123}
+// i => i + 123
+
+// bound / unbound
+const callbacks = [
+  a => a + 1,
+  b => b + 2
+];
+
+target = wrap(
+  callbacks[1],
+  (type, value) => bound(
+    pair(type, callbacks.indexOf(value))
+  )
+);
+// function () { return {type: "function", value: 1} );
+unwrap(unbound(target), (type, value) => {
+  return type === "function" ? callbacks[value] : value;
+});
+// b => b + 2
+
 
 target = wrap(null);
 // {type: "null", value: null}
+unwrap(target);
+// null
 
 target = wrap(1);
 // {type: "number", value: 1}
+unwrap(target);
+// 1
 
 target = wrap(false);
 // {type: "boolean", value: false}
+unwrap(target);
+// false
 
 target = wrap(Symbol());
 // {type: "symbol", value: thatSymbol}
+unwrap(target);
+// thatSymbol
 
 // ... and so on ...
 ```
-
-## Types
-
-Once *unwrap* is used, the `type` of the `{type, value}` *pair* will be the following one:
-
-| JS         | type          |
-| :--------- | :------------ |
-| `[]`       | `"array"`     |
-| `1n`       | `"bigint"`    |
-| `!0`       | `"boolean"`   |
-| `() => {}` | `"function"`  |
-| `null`     | `"null"`      |
-| `1.2`      | `"number"`    |
-| `{}`       | `"object"`    |
-| `''`       | `"string"`    |
-| `Symbol()` | `"symbol"`    |
-| `void 0`   | `"undefined"` |
