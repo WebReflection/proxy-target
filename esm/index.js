@@ -1,5 +1,13 @@
 import { ARRAY, BIGINT, BOOLEAN, FUNCTION, NULL, NUMBER, OBJECT, STRING, SYMBOL, UNDEFINED } from './types.js';
 
+/** @typedef {import("./types.js").BIGINT} BIGINT */
+/** @typedef {import("./types.js").BOOLEAN} BOOLEAN */
+/** @typedef {import("./types.js").NULL} NULL */
+/** @typedef {import("./types.js").NUMBER} NUMBER */
+/** @typedef {import("./types.js").STRING} STRING */
+/** @typedef {import("./types.js").SYMBOL} SYMBOL */
+/** @typedef {import("./types.js").UNDEFINED} UNDEFINED */
+
 const { isArray } = Array;
 
 /**

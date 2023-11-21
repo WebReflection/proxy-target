@@ -3,9 +3,23 @@ export function unwrap<P, V>(wrap: P, revive?: (type: Type, value: any) => any):
 export function wrap<V>(value: V, resolve?: (type: Type, value: any) => any): V extends any[] ? V : V extends Function ? V : Obj<V extends bigint ? "bigint" : V extends boolean ? "boolean" : V extends null ? "null" : V extends number ? "number" : V extends string ? "string" : V extends symbol ? "symbol" : V extends undefined ? "undefined" : "object", V>;
 export function bound<V>(value: V): Bound<V>;
 export function unbound<V, T>(value: V): V extends Bound<T> ? ReturnType<V> : V;
+export type BIGINT = "bigint";
+export type BOOLEAN = "boolean";
+export type NULL = "null";
+export type NUMBER = "number";
+export type STRING = "string";
+export type SYMBOL = "symbol";
+export type UNDEFINED = "undefined";
 export type Bound<V> = () => V;
 export type Obj<T, V> = {
     type: T;
     value: V;
 };
-export type Type = "array" | "bigint" | "boolean" | "function" | "null" | "number" | "object" | "string" | "symbol" | "undefined";
+export type Type = "array" | BIGINT | BOOLEAN | "function" | NULL | NUMBER | "object" | STRING | SYMBOL | UNDEFINED;
+import { BIGINT } from './types.js';
+import { BOOLEAN } from './types.js';
+import { NULL } from './types.js';
+import { NUMBER } from './types.js';
+import { STRING } from './types.js';
+import { SYMBOL } from './types.js';
+import { UNDEFINED } from './types.js';
