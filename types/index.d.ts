@@ -8,10 +8,14 @@ export const OBJECT: "object";
 export const STRING: "string";
 export const SYMBOL: "symbol";
 export const UNDEFINED: "undefined";
-export function pair<Type, Value>(type: Type, value: Value): Pair<Type, Value>;
-export function unwrap<Value>(value: Value): Value extends any[] ? Pair<"array", Value> : Value extends Function ? Pair<"function", Value> : Value;
-export function wrap<V>(value: V): V extends any[] ? V : V extends Function ? V : V extends bigint ? Pair<"bigint", V> : V extends boolean ? Pair<"boolean", V> : V extends null ? Pair<"null", null> : V extends number ? Pair<"number", V> : V extends string ? Pair<"string", V> : V extends symbol ? Pair<"symbol", V> : V extends undefined ? Pair<"undefined", undefined> : Pair<"object", V>;
-export type Pair<Type, Value> = {
-    type: Type;
-    value: Value;
+export function pair<T, V>(type: T, value: V): Pair<T, V>;
+export function unwrap<P>(wrap: P, revive?: <V>(type: Type, value: V) => V): P extends Pair<Type, V> ? V : P;
+export function wrap<V>(value: V, resolve?: <Value>(type: Type, value: Value) => Value extends any[] ? Value : Value extends Function ? Value : Pair<Type, Value>): V extends any[] ? V : V extends Function ? V : Pair<V extends bigint ? "bigint" : V extends boolean ? "boolean" : V extends null ? "null" : V extends number ? "number" : V extends string ? "string" : V extends symbol ? "symbol" : V extends undefined ? "undefined" : "object", V>;
+export function bound<V>(value: V): Bound<V>;
+export function unbound<V>(value: V): V extends Function ? V : V;
+export type Bound<V> = () => V;
+export type Pair<T, V> = {
+    type: T;
+    value: V;
 };
+export type Type = "array" | "bigint" | "boolean" | "function" | "null" | "number" | "object" | "string" | "symbol" | "undefined";

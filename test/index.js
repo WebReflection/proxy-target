@@ -9,7 +9,8 @@ const {
   STRING,
   SYMBOL,
   UNDEFINED,
-  wrap, unwrap,
+  bound, unbound,
+  pair, wrap, unwrap,
 } = require('../cjs');
 
 const assert = (thing, message = 'Unexpected result') => {
@@ -21,43 +22,83 @@ const checkType = ({ type }, expected) => {
   assert(type === expected, `unexpected type ${expected}`);
 };
 
-const arr = wrap([]);
+assert(unbound(bound(Function)) === Function);
+assert(unbound(Object.prototype) === Object.prototype);
+
+const arr = wrap([1,2]);
 assert(Array.isArray(new Proxy(arr, {})));
-checkType(unwrap(arr), ARRAY);
+assert(unwrap(arr).join(',') === '1,2');
+checkType(unwrap(arr, pair), ARRAY);
 
 const big = wrap(1n);
 assert(!Array.isArray(new Proxy(big, {})));
-checkType(unwrap(big), BIGINT);
+assert(unwrap(big) === 1n);
+checkType(unwrap(big, pair), BIGINT);
 
 const bool = wrap(!1);
 assert(!Array.isArray(new Proxy(bool, {})));
-checkType(unwrap(bool), BOOLEAN);
+checkType(unwrap(bool, pair), BOOLEAN);
 
 const fn = wrap(function () {"use strict"; return this });
 assert(!Array.isArray(new Proxy(fn, {})));
 assert(typeof new Proxy(fn, {}) === FUNCTION);
-checkType(unwrap(fn), FUNCTION);
+checkType(unwrap(fn, pair), FUNCTION);
 
 const nope = wrap(null);
 assert(!Array.isArray(new Proxy(nope, {})));
-checkType(unwrap(nope), NULL);
+checkType(unwrap(nope, pair), NULL);
 
 const num = wrap(1.2);
 assert(!Array.isArray(new Proxy(num, {})));
-checkType(unwrap(num), NUMBER);
+checkType(unwrap(num, pair), NUMBER);
 
 const obj = wrap({});
 assert(!Array.isArray(new Proxy(obj, {})));
-checkType(unwrap(obj), OBJECT);
+checkType(unwrap(obj, pair), OBJECT);
 
 const str = wrap('');
 assert(!Array.isArray(new Proxy(str, {})));
-checkType(unwrap(str), STRING);
+checkType(unwrap(str, pair), STRING);
 
 const sym = wrap(Symbol());
 assert(!Array.isArray(new Proxy(sym, {})));
-checkType(unwrap(sym), SYMBOL);
+checkType(unwrap(sym, pair), SYMBOL);
 
 const undef = wrap(void 0);
 assert(!Array.isArray(new Proxy(undef, {})));
-checkType(unwrap(undef), UNDEFINED);
+checkType(unwrap(undef, pair), UNDEFINED);
+
+const i8a = new Int8Array(0);
+const custom = wrap(i8a, (_, value) => pair(value.constructor.name, value));
+assert(custom.type === 'Int8Array');
+assert(custom.value === i8a);
+assert(unwrap(custom) === i8a);
+unwrap(custom, (type, value) => {
+  assert(type === 'Int8Array');
+  assert(value === i8a);
+});
+
+// bound / unbound
+const callbacks = [
+  a => a + 1,
+  b => b + 2
+];
+
+target = wrap(
+  callbacks[1],
+  (type, value) => bound(
+    pair(type, callbacks.indexOf(value))
+  )
+);
+assert(typeof target === 'function');
+assert(
+  unwrap(
+    unbound(target),
+    (type, value) => (
+      type === "function" ?
+        callbacks[value] :
+        value
+    )) === callbacks[1]
+);
+
+console.log('OK');
