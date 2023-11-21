@@ -2,15 +2,9 @@ var proxyTarget = (function (exports) {
   'use strict';
 
   const ARRAY     = 'array';
-  const BIGINT    = 'bigint';
-  const BOOLEAN   = 'boolean';
   const FUNCTION  = 'function';
   const NULL      = 'null';
-  const NUMBER    = 'number';
   const OBJECT    = 'object';
-  const STRING    = 'string';
-  const SYMBOL    = 'symbol';
-  const UNDEFINED = 'undefined';
 
   const { isArray } = Array;
 
@@ -95,16 +89,6 @@ var proxyTarget = (function (exports) {
     return this;
   }
 
-  exports.ARRAY = ARRAY;
-  exports.BIGINT = BIGINT;
-  exports.BOOLEAN = BOOLEAN;
-  exports.FUNCTION = FUNCTION;
-  exports.NULL = NULL;
-  exports.NUMBER = NUMBER;
-  exports.OBJECT = OBJECT;
-  exports.STRING = STRING;
-  exports.SYMBOL = SYMBOL;
-  exports.UNDEFINED = UNDEFINED;
   exports.bound = bound;
   exports.pair = pair;
   exports.unbound = unbound;

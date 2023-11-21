@@ -34,10 +34,20 @@
       "import": "./esm/index.js",
       "default": "./cjs/index.js"
     },
+    "./array": {
+      "types": "./types/array.d.ts",
+      "import": "./esm/array.js",
+      "default": "./cjs/array.js"
+    },
     "./traps": {
       "types": "./types/traps.d.ts",
       "import": "./esm/traps.js",
       "default": "./cjs/traps.js"
+    },
+    "./types": {
+      "types": "./types/types.d.ts",
+      "import": "./esm/types.js",
+      "default": "./cjs/types.js"
     },
     "./package.json": "./package.json"
   },

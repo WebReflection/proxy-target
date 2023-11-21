@@ -13,7 +13,7 @@ This module allows any primitive to complex value to be proxied in a way that an
 
 | type          | value          | wrap                                    |
 | :------------ | :------------- | :-------------------------------------- |
-| `"array"`     | `[1, 2]`       | `[1, 2]`                                |
+| `"array"`     | `[1, 2]`       | `[1, 2]` | ["array", [1,2]] w/array     |
 | `"bigint"`    | `1n`           | `{type: "bigint", value: 1n}`           |
 | `"boolean"`   | `false`        | `{type: "boolean", value: false}`       |
 | `"function"`  | `(a, b) => {}` | `(a, b) => {}`                          |
