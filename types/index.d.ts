@@ -1,13 +1,3 @@
-export const ARRAY: "array";
-export const BIGINT: "bigint";
-export const BOOLEAN: "boolean";
-export const FUNCTION: "function";
-export const NULL: "null";
-export const NUMBER: "number";
-export const OBJECT: "object";
-export const STRING: "string";
-export const SYMBOL: "symbol";
-export const UNDEFINED: "undefined";
 export function pair<T, V>(type: T, value: V): Pair<T, V>;
 export function unwrap<P, V>(wrap: P, revive?: (type: Type, value: any) => any): P extends Pair<Type, V> ? V : P;
 export function wrap<V>(value: V, resolve?: (type: Type, value: any) => any): V extends any[] ? V : V extends Function ? V : Pair<V extends bigint ? "bigint" : V extends boolean ? "boolean" : V extends null ? "null" : V extends number ? "number" : V extends string ? "string" : V extends symbol ? "symbol" : V extends undefined ? "undefined" : "object", V>;

@@ -1,13 +1,4 @@
-export const ARRAY     = 'array';
-export const BIGINT    = 'bigint';
-export const BOOLEAN   = 'boolean';
-export const FUNCTION  = 'function';
-export const NULL      = 'null';
-export const NUMBER    = 'number';
-export const OBJECT    = 'object';
-export const STRING    = 'string';
-export const SYMBOL    = 'symbol';
-export const UNDEFINED = 'undefined';
+import { ARRAY, BIGINT, BOOLEAN, FUNCTION, NULL, NUMBER, OBJECT, STRING, SYMBOL, UNDEFINED } from './types.js';
 
 const { isArray } = Array;
 
