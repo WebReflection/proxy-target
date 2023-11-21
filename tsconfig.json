@@ -7,7 +7,7 @@
         "declaration": true,
         "emitDeclarationOnly": true,
         "strictNullChecks": true,
-        "checkJs": false,
+        "checkJs": true,
         "declarationDir": "types"
     },
     "include": [

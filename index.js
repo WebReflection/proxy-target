@@ -15,7 +15,7 @@ var proxyTarget = (function (exports) {
 
   /**
    * @template T, V
-   * @typedef {{type:T, value:V}} Pair
+   * @typedef {{type:T, value:V}} Obj
    */
 
   /** @typedef {ARRAY | BIGINT | BOOLEAN | FUNCTION | NULL | NUMBER | OBJECT | STRING | SYMBOL | UNDEFINED} Type */
@@ -24,7 +24,7 @@ var proxyTarget = (function (exports) {
    * @template T, V
    * @param {T} type
    * @param {V} value
-   * @returns {Pair<T, V>}
+   * @returns {Obj<T, V>}
    */
   const pair = (type, value) => ({ type, value });
 
@@ -33,7 +33,7 @@ var proxyTarget = (function (exports) {
   /**
    * @template P, V
    * @param {P} wrap
-   * @returns {P extends Pair<Type, V> ? V : P}
+   * @returns {P extends Obj<Type, V> ? V : P}
    */
   const unwrap = (wrap, revive = unwrapDefault) => {
     /** @type {Type} */
@@ -43,8 +43,8 @@ var proxyTarget = (function (exports) {
       // but consider arrays
       if (isArray(wrap))
         type = ARRAY;
-      // otherwise get `{type, value}` form the pair
       else
+        // @ts-ignore
         ({ type, value } = wrap);
     }
     return revive(type, value);
@@ -60,7 +60,7 @@ var proxyTarget = (function (exports) {
    * It returns the function or the array as they are otherwise.
    * @template V
    * @param {V} value
-   * @returns {V extends Array ? V : V extends Function ? V : Pair<V extends bigint ? BIGINT : V extends boolean ? BOOLEAN : V extends null ? NULL : V extends number ? NUMBER : V extends string ? STRING : V extends symbol ? SYMBOL : V extends undefined ? UNDEFINED : OBJECT, V>}
+   * @returns {V extends Array ? V : V extends Function ? V : Obj<V extends bigint ? BIGINT : V extends boolean ? BOOLEAN : V extends null ? NULL : V extends number ? NUMBER : V extends string ? STRING : V extends symbol ? SYMBOL : V extends undefined ? UNDEFINED : OBJECT, V>}
    */
   const wrap = (value, resolve = wrapDefault) => {
     const type = value === null ? NULL : typeof value;
@@ -79,11 +79,15 @@ var proxyTarget = (function (exports) {
   /**
    * Invoke a possibly bound value if the parameter is a function.
    * This is handy only for values that passed through `bound(value)`.
-   * @template V, B
+   * @template V, T
    * @param {V} value
-   * @returns {V extends Bound<B> ? B : V}
+   * @returns {V extends Bound<T> ? ReturnType<V> : V}
    */
-  const unbound = value => typeof value === FUNCTION ? value() : value;
+  const unbound = value => (
+    typeof value === FUNCTION ?
+      (/** @type {Function} */ (value))() :
+      value
+  );
 
   function what() {
     return this;
