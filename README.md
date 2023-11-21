@@ -6,14 +6,14 @@ A wrap/unwrap Proxy utility as answer to [these](https://es.discourse.group/t/th
 
 This module allows any primitive to complex value to be proxied in a way that any handler can understand once the `unwrap(target)` operation is performed among actions:
 
-  * *arrays* remain arrays and *callbacks* remain callbacks
+  * *callbacks* remain callbacks and *arrays* remain arrays unless `proxy-target/array` is used
   * *primitives* and *null*, *undefined* or *object* generic types are preserved, among any other primitive, and return `{type: actualType, value: actualValue}` once wrapped
 
 ## Type / Value -> Wrap
 
 | type          | value          | wrap                                    |
 | :------------ | :------------- | :-------------------------------------- |
-| `"array"`     | `[1, 2]`       | `[1, 2]` | ["array", [1,2]] w/array     |
+| `"array"`     | `[1, 2]`       | `[1, 2]` or `["array", [1,2]]` w/array  |
 | `"bigint"`    | `1n`           | `{type: "bigint", value: 1n}`           |
 | `"boolean"`   | `false`        | `{type: "boolean", value: false}`       |
 | `"function"`  | `(a, b) => {}` | `(a, b) => {}`                          |
