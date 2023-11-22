@@ -32,7 +32,7 @@ This module allows any primitive to complex value to be proxied in a way that an
 import {
   bound,  // return a function that returns its bound context
   unbound,// if function, invokes it to return the context
-  pair,   // create a `{type, value}` pair to proxy as target
+  target, // create a `{type, value}` pair to proxy as target
   wrap,   // returns array, function, or a pair
   unwrap  // returns the wrapped value
 } from 'proxy-target';
@@ -46,7 +46,7 @@ unwrap(target);
 
 // both wrap and unwrap accept an optional callback
 // the returned value will the one returned by wrap
-target = wrap({a: 1}, (type, value) => pair(type, value));
+target = wrap({a: 1}, (type, value) => target(type, value));
 // {type: "object", value: {a: 1}}
 unwrap(target, (type, value) => value);
 // {a: 1}
@@ -65,7 +65,7 @@ const callbacks = [
 target = wrap(
   callbacks[1],
   (type, value) => bound(
-    pair(type, callbacks.indexOf(value))
+    target(type, callbacks.indexOf(value))
   )
 );
 // function () { return {type: "function", value: 1} );
