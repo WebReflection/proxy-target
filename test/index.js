@@ -87,4 +87,8 @@ assert(
 require('./all.js');
 require('./array.js');
 
+require('./types/all.js');
+require('./types/array.js');
+require('./types/index.js');
+
 console.log('OK');

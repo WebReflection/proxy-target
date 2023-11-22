@@ -1,14 +1,30 @@
-import { ARRAY, BIGINT, BOOLEAN, FUNCTION, NULL, NUMBER, OBJECT, STRING, SYMBOL, UNDEFINED } from './types.js';
-import { isArray, reviver, tv } from './utils.js';
+import { ARRAY, FUNCTION, NULL, OBJECT } from './types.js';
+import { isArray, reviver, obj } from './utils.js';
 
 export { bound, unbound } from './utils.js';
 
-export const target = tv;
+export const target = obj;
+
+/**
+ * @template T, V
+ * @typedef {import("./utils.js").Obj<T, V>} Obj
+ */
+
+/**
+ * @template V
+ * @typedef {import("./utils.js").TypeOf<V>} TypeOf
+ */
+
+/**
+ * @template W, T, V
+ * @typedef {W extends Function ? W : W extends Array ? W : W extends Obj<T, V> ? W["v"] : never} ValueOf
+ */
 
 /**
  * @template W, T, V
  * @param {W} wrap
- * @returns {W extends import("./utils.js").Obj<T, V> ? W["v"] : W}
+ * @param {typeof reviver} [revive]
+ * @returns
  */
 export const unwrap = (wrap, revive = reviver) => {
   /** @type {string} */
@@ -17,10 +33,9 @@ export const unwrap = (wrap, revive = reviver) => {
     if (isArray(wrap))
       type = ARRAY;
     else
-      // @ts-ignore
-      ({ t: type, v: value } = wrap);
+      ({ t: type, v: value } = /** @type {Obj<string, any>} */ (wrap));
   }
-  return revive(type, value);
+  return revive(type, /** @type {ValueOf<W, T, V>} */ (value));
 };
 
 const resolver = (type, value) => (
@@ -33,7 +48,7 @@ const resolver = (type, value) => (
  * It returns the function or the array as they are otherwise.
  * @template V
  * @param {V} value
- * @returns {V extends Array ? V : V extends Function ? V : import("./utils.js").Obj<V extends bigint ? BIGINT : V extends boolean ? BOOLEAN : V extends null ? NULL : V extends number ? NUMBER : V extends string ? STRING : V extends symbol ? SYMBOL : V extends undefined ? UNDEFINED : OBJECT, V>}
+ * @returns {V extends Array ? V : V extends Function ? V : Obj<TypeOf<V>, V>}
  */
 export const wrap = (value, resolve = resolver) => {
   const type = value === null ? NULL : typeof value;

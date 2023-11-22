@@ -1,5 +1,5 @@
-import { ARRAY, BIGINT, BOOLEAN, FUNCTION, NULL, NUMBER, OBJECT, STRING, SYMBOL, UNDEFINED } from './types.js';
-import { isArray, reviver, tv } from './utils.js';
+import { ARRAY, FUNCTION, NULL, OBJECT } from './types.js';
+import { isArray, reviver, obj } from './utils.js';
 
 export { bound, unbound } from './utils.js';
 
@@ -14,21 +14,36 @@ export { bound, unbound } from './utils.js';
  */
 
 /**
+ * @template V
+ * @typedef {import("./utils.js").TypeOf<V>} TypeOf
+ */
+
+/**
+ * @template W, T, V
+ * @typedef {W extends Function ? W : W extends Arr<V> ? W[0] : W extends Obj<T, V> ? W["v"] : never} ValueOf
+ */
+
+/**
  * @template {string} T
  * @template V
  * @param {T} type
  * @param {V} value
  * @returns {T extends typeof ARRAY ? Arr<V> : Obj<T, V>}
  */
+export const target = (type, value) =>
+// @see https://github.com/microsoft/TypeScript/issues/33014
 // @ts-ignore
-export const target = (type, value) => (
-  type === ARRAY ? [value] : tv(type, value)
+(
+  type === ARRAY ?
+    (/** @type {Arr<V>} */ ([value])) :
+    obj(type, value)
 );
 
 /**
  * @template W, T, V
  * @param {W} wrap
- * @returns {W extends Function ? W : W extends Arr<V> ? W[0] : W extends Obj<T, V> ? W["v"] : never}
+ * @param {typeof reviver} [revive]
+ * @returns
  */
 export const unwrap = (wrap, revive = reviver) => {
   /** @type {string} */
@@ -38,12 +53,10 @@ export const unwrap = (wrap, revive = reviver) => {
       type = ARRAY;
       value = wrap.at(0);
     }
-    else {
-      // @ts-ignore
-      ({ t: type, v: value } = wrap);
-    }
+    else
+      ({ t: type, v: value } = /** @type {Obj<string, any>} */ (wrap));
   }
-  return revive(type, value);
+  return revive(type, /** @type {ValueOf<W, T, V>} */ (value));
 };
 
 const resolver = (type, value) => (
@@ -56,7 +69,7 @@ const resolver = (type, value) => (
  * @template V
  * @param {V} value
  * @param {Function} [resolve]
- * @returns {V extends Function ? V : V extends Array ? Arr<V> : Obj<V extends bigint ? BIGINT : V extends boolean ? BOOLEAN : V extends null ? NULL : V extends number ? NUMBER : V extends string ? STRING : V extends symbol ? SYMBOL : V extends undefined ? UNDEFINED : OBJECT, V>}
+ * @returns {V extends Function ? V : V extends Array ? Arr<V> : Obj<TypeOf<V>, V>}
  */
 export const wrap = (value, resolve = resolver) => {
   const type = value === null ? NULL : typeof value;

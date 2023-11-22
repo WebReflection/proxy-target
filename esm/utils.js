@@ -1,15 +1,16 @@
-import { FUNCTION } from './types.js';
+import { BIGINT, BOOLEAN, FUNCTION, NULL, NUMBER, OBJECT, STRING, SYMBOL, UNDEFINED } from './types.js';
 
 const { isArray } = Array;
 
 export { isArray };
 
-export const invoke = value => (/** @type {Function} */ (value))();
+export const invoke = value => /** @type {Function} */ (value)();
 
 /**
+ * @template Value
  * @param {string} type
- * @param {any} value
- * @returns
+ * @param {Value} value
+ * @returns {Value}
  */
 export const reviver = (type, value) => value;
 
@@ -29,12 +30,17 @@ export const reviver = (type, value) => value;
  */
 
 /**
+ * @template V
+ * @typedef {V extends bigint ? BIGINT : V extends boolean ? BOOLEAN : V extends null ? NULL : V extends number ? NUMBER : V extends string ? STRING : V extends symbol ? SYMBOL : V extends undefined ? UNDEFINED : V extends object ? OBJECT : never} TypeOf
+ */
+
+/**
  * @template T, V
  * @param {T} t
  * @param {V} v
  * @returns {Obj<T, V>}
  */
-export const tv = (t, v) => ({t, v});
+export const obj = (t, v) => ({t, v});
 
 /**
  * @template V
