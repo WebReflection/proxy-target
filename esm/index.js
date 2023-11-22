@@ -1,26 +1,19 @@
-import { ARRAY, BIGINT, BOOLEAN, FUNCTION, NULL, NUMBER, OBJECT, STRING, SYMBOL, UNDEFINED } from './types.js';
+import { ARRAY, FUNCTION, NULL, OBJECT } from './types.js';
+import { isArray, reviver } from './utils.js';
+
+export { bound, unbound } from './utils.js';
 
 /** @typedef {import("./types.js").BIGINT} BIGINT */
 /** @typedef {import("./types.js").BOOLEAN} BOOLEAN */
-/** @typedef {import("./types.js").NULL} NULL */
 /** @typedef {import("./types.js").NUMBER} NUMBER */
 /** @typedef {import("./types.js").STRING} STRING */
 /** @typedef {import("./types.js").SYMBOL} SYMBOL */
 /** @typedef {import("./types.js").UNDEFINED} UNDEFINED */
 
-const { isArray } = Array;
-
-/**
- * @template V
- * @typedef {() => V} Bound
- */
-
 /**
  * @template T, V
  * @typedef {{type:T, value:V}} Obj
  */
-
-/** @typedef {ARRAY | BIGINT | BOOLEAN | FUNCTION | NULL | NUMBER | OBJECT | STRING | SYMBOL | UNDEFINED} Type */
 
 /**
  * @template T, V
@@ -30,29 +23,25 @@ const { isArray } = Array;
  */
 export const pair = (type, value) => ({ type, value });
 
-const unwrapDefault = (/** @type {Type} */ type, value) => value;
-
 /**
- * @template P, V
- * @param {P} wrap
- * @returns {P extends Obj<Type, V> ? V : P}
+ * @template W, T, V
+ * @param {W} wrap
+ * @param {(type:string, value:any) => any} [revive]
+ * @returns {W extends Function ? W : W extends Array ? W : W extends Obj<T, V> ? W["value"] : never}
  */
-export const unwrap = (wrap, revive = unwrapDefault) => {
-  /** @type {Type} */
+export const unwrap = (wrap, revive = reviver) => {
+  /** @type {string} */
   let type = typeof wrap, value = wrap;
-  // ignore function
   if (type === OBJECT) {
-    // but consider arrays
     if (isArray(wrap))
       type = ARRAY;
     else
-      // @ts-ignore
-      ({ type, value } = wrap);
+      ({ type, value } = (/** @type {Obj<string, any>} */ (wrap)));
   }
   return revive(type, value);
 };
 
-const wrapDefault = (/** @type {Type} */ type, value) => (
+const resolver = (type, value) => (
   type === FUNCTION || type === ARRAY ?
     value : pair(type, value)
 );
@@ -64,34 +53,7 @@ const wrapDefault = (/** @type {Type} */ type, value) => (
  * @param {V} value
  * @returns {V extends Array ? V : V extends Function ? V : Obj<V extends bigint ? BIGINT : V extends boolean ? BOOLEAN : V extends null ? NULL : V extends number ? NUMBER : V extends string ? STRING : V extends symbol ? SYMBOL : V extends undefined ? UNDEFINED : OBJECT, V>}
  */
-export const wrap = (value, resolve = wrapDefault) => {
+export const wrap = (value, resolve = resolver) => {
   const type = value === null ? NULL : typeof value;
   return resolve(type === OBJECT && isArray(value) ? ARRAY : type, value);
 };
-
-/**
- * Binds a generic value into a function that returns the value itself.
- * This is handy to hold different data and still allow all callback traps.
- * @template V
- * @param {V} value
- * @returns {Bound<V>}
- */
-export const bound = value => what.bind(value);
-
-/**
- * Invoke a possibly bound value if the parameter is a function.
- * This is handy only for values that passed through `bound(value)`.
- * @template V, T
- * @param {V} value
- * @returns {V extends Bound<T> ? ReturnType<V> : V}
- */
-export const unbound = value => (
-  typeof value === FUNCTION ?
-    (/** @type {Function} */ (value))() :
-    value
-);
-
-function what() {
-  'use strict';
-  return this;
-}
