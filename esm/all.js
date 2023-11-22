@@ -1,7 +1,12 @@
 import { ARRAY, BIGINT, BOOLEAN, FUNCTION, NULL, NUMBER, OBJECT, STRING, SYMBOL, UNDEFINED } from './types.js';
-import { isArray, reviver } from './utils.js';
+import { isArray, bound, invoke, reviver } from './utils.js';
 
 export { bound, unbound } from './utils.js';
+
+/**
+ * @template V
+ * @typedef {import("./utils.js").Bound<V>} Bound
+ */
 
 /**
  * @template T, V
@@ -18,22 +23,27 @@ export { bound, unbound } from './utils.js';
  * @template V
  * @param {T} type
  * @param {V} value
- * @returns {T extends typeof ARRAY ? Arr<V> : Obj<T, V>}
+ * @returns {T extends typeof FUNCTION ? Bound<V> : T extends typeof ARRAY ? Arr<V> : Obj<T, V>}
  */
-// @ts-ignore
-export const pair = (type, value) => (
-  type === ARRAY ? [ARRAY, value] : {type, value}
-);
+export const pair = (type, value) => {
+  // @ts-ignore
+  if (type === ARRAY) return [type, value];
+  const tv = {type, value};
+  // @ts-ignore
+  return type === FUNCTION ? bound(tv) : tv;
+};
 
 /**
  * @template W, T, V
  * @param {W} wrap
- * @returns {W extends Function ? W : W extends Arr<V> ? W[1] : W extends Obj<T, V> ? W["value"] : never}
+ * @returns {W extends Bound<V> ? ReturnType<W> : W extends Arr<V> ? W[1] : W extends Obj<T, V> ? W["value"] : never}
  */
 export const unwrap = (wrap, revive = reviver) => {
   /** @type {string} */
   let type = typeof wrap, value = wrap;
-  if (type === OBJECT) {
+  if (type === FUNCTION)
+    ({ type, value } = invoke(wrap));
+  else if (type === OBJECT) {
     if (isArray(wrap))
       [ type, value ] = wrap;
     else
@@ -43,19 +53,15 @@ export const unwrap = (wrap, revive = reviver) => {
   return revive(type, value);
 };
 
-const resolver = (type, value) => (
-  type === FUNCTION ? value : pair(type, value)
-);
-
 /**
  * Returns a `{type, value}` pair if the value is not a function and not an array.
  * It returns the function or the array as they are otherwise.
  * @template V
  * @param {V} value
  * @param {Function} [resolve]
- * @returns {V extends Function ? V : V extends Array ? Arr<V> : Obj<V extends bigint ? BIGINT : V extends boolean ? BOOLEAN : V extends null ? NULL : V extends number ? NUMBER : V extends string ? STRING : V extends symbol ? SYMBOL : V extends undefined ? UNDEFINED : OBJECT, V>}
+ * @returns {V extends Function ? Bound<V> : V extends Array ? Arr<V> : Obj<V extends bigint ? BIGINT : V extends boolean ? BOOLEAN : V extends null ? NULL : V extends number ? NUMBER : V extends string ? STRING : V extends symbol ? SYMBOL : V extends undefined ? UNDEFINED : OBJECT, V>}
  */
-export const wrap = (value, resolve = resolver) => {
+export const wrap = (value, resolve = pair) => {
   const type = value === null ? NULL : typeof value;
   return resolve(type === OBJECT && isArray(value) ? ARRAY : type, value);
 };

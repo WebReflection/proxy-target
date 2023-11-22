@@ -11,6 +11,7 @@
         "declarationDir": "types"
     },
     "include": [
+        "esm/all.js",
         "esm/array.js",
         "esm/index.js",
         "esm/traps.js",

@@ -1,21 +1,22 @@
 import {nodeResolve} from '@rollup/plugin-node-resolve';
 import terser from '@rollup/plugin-terser';
 
-
-export default {
-  input: './esm/index.js',
+const configFor = name => ({
+  input: `./esm/${name}.js`,
   plugins: [
-    
     nodeResolve(),
-    
     terser()
   ],
-  
   output: {
-    esModule: false,
-    exports: 'named',
-    file: './es.js',
-    format: 'iife',
-    name: 'proxyTarget'
+    esModule: true,
+    file: `./dist/${name}.js`,
   }
-};
+});
+
+export default [
+  configFor('all'),
+  configFor('array'),
+  configFor('index'),
+  configFor('traps'),
+  configFor('types'),
+];
