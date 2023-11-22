@@ -13,6 +13,7 @@
     "include": [
         "esm/all.js",
         "esm/array.js",
+        "esm/function.js",
         "esm/index.js",
         "esm/traps.js",
         "esm/types.js",

@@ -13,10 +13,10 @@ This module allows any primitive to complex value to be proxied in a way that an
 
 | type          | value          | wrap                                    |
 | :------------ | :------------- | :-------------------------------------- |
-| `"array"`     | `[1, 2]`       | `[1, 2]` or `["array", [1,2]]` w/array  |
+| `"array"`     | `[1, 2]`       | `[1, 2]` or `[[1,2]]` w/array           |
 | `"bigint"`    | `1n`           | `{type: "bigint", value: 1n}`           |
 | `"boolean"`   | `false`        | `{type: "boolean", value: false}`       |
-| `"function"`  | `(a, b) => {}` | `(a, b) => {}`                          |
+| `"function"`  | `(a, b) => {}` | `(a, b) => {}` or `Ctx.bind(fn)` w/all  |
 | `"null"`      | `null`         | `{type: "null", value: null}`           |
 | `"number"`    | `1.2`          | `{type: "number", value: 1.2}`          |
 | `"object"`    | `{a: 0}`       | `{type: "object", value: {a: 0}}`       |
@@ -24,7 +24,7 @@ This module allows any primitive to complex value to be proxied in a way that an
 | `"symbol"`    | `Symbol()`     | `{type: "symbol", value: Symbol()}`     |
 | `"undefined"` | `void 0`       | `{type: "undefined", value: undefined}` |
 |               |                |                                         |
-| `"custom"`    | notArrOrFunc   | `{type: "custom", value: notArrOrFunc}` |
+| `"custom"`    | `notArrOrFunc` | `{type: "custom", value: notArrOrFunc}` |
 
 ## Example / API
 

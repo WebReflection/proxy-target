@@ -1,16 +1,16 @@
 import { ARRAY, BIGINT, BOOLEAN, FUNCTION, NULL, NUMBER, OBJECT, STRING, SYMBOL, UNDEFINED } from './types.js';
-import { isArray, reviver } from './utils.js';
+import { isArray, reviver, tv } from './utils.js';
 
 export { bound, unbound } from './utils.js';
 
 /**
- * @template T, V
- * @typedef {{type:T, value:V}} Obj
+ * @template V
+ * @typedef {import("./utils.js").Arr<V>} Arr
  */
 
 /**
- * @template V
- * @typedef {[ARRAY, V]} Arr
+ * @template T, V
+ * @typedef {import("./utils.js").Obj<T, V>} Obj
  */
 
 /**
@@ -21,34 +21,37 @@ export { bound, unbound } from './utils.js';
  * @returns {T extends typeof ARRAY ? Arr<V> : Obj<T, V>}
  */
 // @ts-ignore
-export const pair = (type, value) => (
-  type === ARRAY ? [ARRAY, value] : {type, value}
+export const target = (type, value) => (
+  type === ARRAY ? [value] : tv(type, value)
 );
 
 /**
  * @template W, T, V
  * @param {W} wrap
- * @returns {W extends Function ? W : W extends Arr<V> ? W[1] : W extends Obj<T, V> ? W["value"] : never}
+ * @returns {W extends Function ? W : W extends Arr<V> ? W[0] : W extends Obj<T, V> ? W["v"] : never}
  */
 export const unwrap = (wrap, revive = reviver) => {
   /** @type {string} */
   let type = typeof wrap, value = wrap;
   if (type === OBJECT) {
-    if (isArray(wrap))
-      [ type, value ] = wrap;
-    else
+    if (isArray(wrap)) {
+      type = ARRAY;
+      value = wrap.at(0);
+    }
+    else {
       // @ts-ignore
-      ({ type, value } = wrap);
+      ({ t: type, v: value } = wrap);
+    }
   }
   return revive(type, value);
 };
 
 const resolver = (type, value) => (
-  type === FUNCTION ? value : pair(type, value)
+  type === FUNCTION ? value : target(type, value)
 );
 
 /**
- * Returns a `{type, value}` pair if the value is not a function and not an array.
+ * Returns a `{t, v}` pair if the value is not a function and not an array.
  * It returns the function or the array as they are otherwise.
  * @template V
  * @param {V} value
