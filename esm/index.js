@@ -44,11 +44,9 @@ const resolver = (type, value) => (
 );
 
 /**
- * Returns a `{t, v}` pair if the value is not a function and not an array.
- * It returns the function or the array as they are otherwise.
  * @template V
  * @param {V} value
- * @returns {V extends Array ? V : V extends Function ? V : Obj<TypeOf<V>, V>}
+ * @returns {V extends Function ? V : V extends Array ? V : Obj<TypeOf<V>, V>}
  */
 export const wrap = (value, resolve = resolver) => {
   const type = value === null ? NULL : typeof value;

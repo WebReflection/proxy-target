@@ -64,8 +64,6 @@ const resolver = (type, value) => (
 );
 
 /**
- * Returns a `{t, v}` pair if the value is not a function and not an array.
- * It returns the function or the array as they are otherwise.
  * @template V
  * @param {V} value
  * @param {Function} [resolve]
