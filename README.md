@@ -37,23 +37,23 @@ import {
   unwrap  // returns the wrapped value
 } from 'proxy-target';
 
-let target;
+let proxied;
 
-target = wrap([1, 2, 3]);
+proxied = wrap([1, 2, 3]);
 // remains [1, 2, 3]
-unwrap(target);
+unwrap(proxied);
 // still [1, 2, 3]
 
 // both wrap and unwrap accept an optional callback
 // the returned value will the one returned by wrap
-target = wrap({a: 1}, (type, value) => target(type, value));
+proxied = wrap({a: 1}, (type, value) => target(type, value));
 // {type: "object", value: {a: 1}}
-unwrap(target, (type, value) => value);
+unwrap(proxied, (type, value) => value);
 // {a: 1}
 
-target = wrap(i => i + 123);
+proxied = wrap(i => i + 123);
 // remains i => i + 123
-unwrap(target);
+unwrap(proxied);
 // i => i + 123
 
 // bound / unbound
@@ -62,37 +62,37 @@ const callbacks = [
   b => b + 2
 ];
 
-target = wrap(
+proxied = wrap(
   callbacks[1],
   (type, value) => bound(
     target(type, callbacks.indexOf(value))
   )
 );
 // function () { return {type: "function", value: 1} );
-unwrap(unbound(target), (type, value) => {
+unwrap(unbound(proxied), (type, value) => {
   return type === "function" ? callbacks[value] : value;
 });
 // b => b + 2
 
 
-target = wrap(null);
+proxied = wrap(null);
 // {type: "null", value: null}
-unwrap(target);
+unwrap(proxied);
 // null
 
-target = wrap(1);
+proxied = wrap(1);
 // {type: "number", value: 1}
-unwrap(target);
+unwrap(proxied);
 // 1
 
-target = wrap(false);
+proxied = wrap(false);
 // {type: "boolean", value: false}
-unwrap(target);
+unwrap(proxied);
 // false
 
-target = wrap(Symbol());
+proxied = wrap(Symbol());
 // {type: "symbol", value: thatSymbol}
-unwrap(target);
+unwrap(proxied);
 // thatSymbol
 
 // ... and so on ...
